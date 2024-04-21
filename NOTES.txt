@@ -15,3 +15,8 @@ Avg: 5
 Max Clique: 15 21 24 
 Node degrees: 8 4 6
 Size: 3
+
+Q30V400
+Density: 35%
+Average Degree: 142
+Max Degree: 246

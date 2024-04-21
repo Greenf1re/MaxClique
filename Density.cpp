@@ -205,7 +205,7 @@ int main(int argc, char** argv){
             maxCliqueSize = count;
         }
     }
-    cout << "Estimated Max Clique Size: " << maxCliqueSize << endl;
+    cout << "Estimated Max Clique Size: " << (((double)density/100.0) * NODES) << endl;
     int maxDegree = 0;
     for(int i = 0; i < NODES; i++){
         if(nodeList[i].degree > maxDegree){

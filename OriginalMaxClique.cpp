@@ -5,8 +5,13 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <mutex>
+#include <thread>
 #define DEBUG false
+#define THREADED false
 using namespace std;
+std::mutex mlock; 
+
 int NODES = 0;
 class Node{
     public:
@@ -194,24 +199,36 @@ int main(int argc, char** argv){
     // }
     // Calculate similarity matrix
     cout << "Calculating Similarity Matrix\n";
+    //start timer
+    auto start = chrono::high_resolution_clock::now();
     int **similarity = new int*[NODES];
     for(int i = 0; i < NODES; i++){
         similarity[i] = new int[NODES];
     }
     int maxSimilarity = 0;
     int row1, row2;
-    for(int i = 0; i < NODES; i++){
-        similarity[i][i] = 0;
-        for(int j = i+1; j < NODES; j++){
-            similarity[i][j] = FindPosSimilarity(graph, graph[i], j);
-            similarity[j][i] = similarity[i][j];
-            if(similarity[i][j] > maxSimilarity){
-                maxSimilarity = similarity[i][j];
-                row1 = i;
-                row2 = j;
+    if (!THREADED){
+        for(int i = 0; i < NODES; i++){
+            similarity[i][i] = 0;
+            for(int j = i+1; j < NODES; j++){
+                // cout << "Row: " << i << " Compare: " << j << endl;
+                similarity[i][j] = FindPosSimilarity(graph, graph[i], j);
+                similarity[j][i] = similarity[i][j];
+                if(similarity[i][j] > maxSimilarity){
+                    maxSimilarity = similarity[i][j];
+                    row1 = i;
+                    row2 = j;
+                }
             }
         }
     }
+    // Calculate similarity matrix with multitheading TODO
+    
+    //end timer
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+    cout << "Time: " << duration.count() << "ms" << endl;
+    ////////////////////////////////////////////////////////////////////
     // Print similarity matrix
     if(DEBUG){
         for(int i = 0; i < NODES; i++){
@@ -221,7 +238,7 @@ int main(int argc, char** argv){
             cout << endl;
         }
     }
-    
+
     cout << "Max Similarity: " << maxSimilarity << " Row1: " << row1 << " Row2: " << row2 << endl;
     vector<Node> triedCliques;
     triedCliques.push_back(nodeList[row1]);

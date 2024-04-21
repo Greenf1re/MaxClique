@@ -5,7 +5,8 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#define DEBUG true
+#include <chrono>
+#define DEBUG false
 using namespace std;
 int NODES = 0;
 class Node{
@@ -194,9 +195,14 @@ int main(int argc, char** argv){
     ReadGraph(filename, graph, nodeList);
     // find degree
     vector<Node> test = nodeList;
-    CountEdges(graph, test);
-    cout << "TEST: " << endl;
+    // CountEdges(graph, test);
+    // cout << "TEST: " << endl;
+    // Timer
+    auto start = chrono::high_resolution_clock::now();
     CountInvEdges(graph, nodeList);
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+    cout << "Time: " << duration.count() << " microseconds" << endl;
 ////////////////////////////////////////////////////////////////
     vector<Node> vertexCover;
     vector<Edge> edges;
@@ -255,14 +261,13 @@ int main(int argc, char** argv){
         }
     }
     // 
-    if(DEBUG){
-        cout << "Max Clique: ";
-        for(int i = 0; i < (int)independentSet.size(); i++){
-            cout << independentSet[i] << " ";
-        }
-        cout << "Is clique "  << VerifyClique(graph, independentSet);
-        cout << endl;
+    cout << "Max Clique: ";
+    for(int i = 0; i < (int)independentSet.size(); i++){
+        cout << independentSet[i] << " ";
     }
+    cout << endl << "Size: " << independentSet.size() << endl;
+    cout << "Is clique "  << VerifyClique(graph, independentSet);
+    cout << endl;
     ////////////////////////////////////////////////////////////////////
     
 
