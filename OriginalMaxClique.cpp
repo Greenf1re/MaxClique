@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#define DEBUG true
+#define DEBUG false
 using namespace std;
 int NODES = 0;
 class Node{
@@ -168,7 +168,7 @@ int main(int argc, char** argv){
         graph[i] = new uint8_t[NODES];
     }
     nodeList.resize(NODES);
-
+    cout << "Reading Graph\n";
     ReadGraph(filename, graph, nodeList);
     // print the graph
     if(DEBUG){
@@ -176,10 +176,10 @@ int main(int argc, char** argv){
     }
     ////////////////////////////////////////////////////////////////////
     vector<Node> maxClique;
-    CountEdges(graph, nodeList);
-    for (int i = 0; i < NODES; i++){
-        cout << nodeList[i] << " " << nodeList[i].degree << endl;
-    }
+    // CountEdges(graph, nodeList);
+    // for (int i = 0; i < NODES; i++){
+    //     cout << nodeList[i] << " " << nodeList[i].degree << endl;
+    // }
     // sort(nodeList.begin(), nodeList.end());
     // int avgDegree = AverageDegree(nodeList);
     // cout << "Average Degree: " << avgDegree << endl;
@@ -193,6 +193,7 @@ int main(int argc, char** argv){
     //     }
     // }
     // Calculate similarity matrix
+    cout << "Calculating Similarity Matrix\n";
     int **similarity = new int*[NODES];
     for(int i = 0; i < NODES; i++){
         similarity[i] = new int[NODES];
@@ -220,6 +221,8 @@ int main(int argc, char** argv){
             cout << endl;
         }
     }
+    
+    cout << "Max Similarity: " << maxSimilarity << " Row1: " << row1 << " Row2: " << row2 << endl;
     vector<Node> triedCliques;
     triedCliques.push_back(nodeList[row1]);
     // triedCliques.push_back(nodeList[row2]);

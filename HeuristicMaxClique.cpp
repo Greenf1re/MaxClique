@@ -51,20 +51,70 @@ class Node{
         }
 };
 class Edge{
-    int u;
-    int v;
+    Node u;
+    Node v;
     public:
-        Edge(int u, int v){
+        Edge(Node u, Node v){
             this->u = u;
             this->v = v;
         }
-        int uName(){
+        Node getU(){
             return u;
         }
-        int vName(){
+        Node getV(){
             return v;
         }
+        int uName(){
+            return u.name();
+        }
+        int vName(){
+            return v.name();
+        }
+        bool operator==(const Edge& e) const{
+            return (u == e.u && v == e.v) || (u == e.v && v == e.u);
+        }
+        bool operator<(Edge& e){
+            // return u < e.u;
+            // Find max of u and v
+            // int max1 = max(u.name(), v.name());
+            // int max2 = max(e.uName(), e.vName());
+            int max1 = u.degree + v.degree;
+            int max2 = e.u.degree + e.v.degree;
+            return max1 < max2;
+        }
+        int degree(){
+            // return max(u.degree, v.degree);
+            return u.degree + v.degree;
+        }
+        friend ostream& operator<<(ostream& os, const Edge& e){
+            os << e.u << "-" << e.v;
+            return os;
+        }
 };
+void CountInvEdges(uint8_t** Graph, vector<Node>& clique){
+    // Count the number of edges in the graph and store in return vector
+    for(int i = 0; i < (int)clique.size(); i++){
+        for(int j = 0; j < i; j++){
+            if((uint8_t)Graph[clique[i].name()][clique[j].name()] == '0'){ 
+                clique[i].degree++;
+                clique[j].degree++;
+                // cout << "Incrementing: " << clique[i] << " At x,y " << i << " " << j << endl;
+                // cout << "Incrementing: " << clique[j] << " At x,y " << i << " " << j << endl << endl;
+            }
+        }
+    }
+}
+void CountEdges(uint8_t** Graph, vector<Node>& clique){
+    // Count the number of edges in the graph and store in return vector
+    for(int i = 0; i < (int)clique.size(); i++){
+        for(int j = 0; j < (int)clique.size(); j++){
+            if((uint8_t)Graph[clique[i].name()][clique[j].name()] != '0'){ 
+                clique[i].degree++;
+                cout << "Incrementing: " << clique[i] << " At x,y " << i << " " << j << endl;
+            }
+        }
+    }
+}
 void ReadGraph(string filename, uint8_t **graph, vector<Node>& nodeList){
     ifstream file;
     file.open(filename);
@@ -120,7 +170,6 @@ void SaveCliqueToFile(vector<Node>& clique){
 }
 int main(int argc, char** argv){
     uint8_t **graph = NULL;
-    uint8_t **graphInv = NULL;
     vector<Node> nodeList;
     string filename;
 
@@ -143,67 +192,46 @@ int main(int argc, char** argv){
     nodeList.resize(NODES);
 
     ReadGraph(filename, graph, nodeList);
-    // print the graph
-    // if(DEBUG){
-    //     PrintGraph(graph, nodeList);
-    // }
-    ////////////////////////////////////////////////////////////////////
-    // O(E) vertex cover algorithm that guarentees no worse than 2x solution
-    ////////////////////////////////////////////////////////////////////
-    // Find a max clique using this Vertex Cover pseudocode:
-    // "C = NULL
-    // E’ = G.E
-    // While E’ != NULL
-    //     Let (u,v) be an arbitrary edge of E’
-    //     C = C UNION {u,v}
-    //     Remove from E’ edge (u,v) and every edge incident on either u or v
-    // Return C
-    // "
-    // Populate inverse of graph
-    graphInv = new uint8_t*[NODES];
-    for(int i = 0; i < NODES; i++){
-        graphInv[i] = new uint8_t[NODES];
-    }
-    
-    for(int i = 0; i < NODES; i++){
-        for(int j = 0; j <= i; j++){
-            if (i == j) graphInv[i][j] = '0';
-            if(graphInv[i][j] == '1'){
-                graphInv[i][j] = '0';
-                graphInv[j][i] = '0';
-            }
-            else{
-                graphInv[i][j] = '1';
-                graphInv[j][i] = '1';
-            }
-        }
-    }
+    // find degree
+    vector<Node> test = nodeList;
+    CountEdges(graph, test);
+    cout << "TEST: " << endl;
+    CountInvEdges(graph, nodeList);
+////////////////////////////////////////////////////////////////
     vector<Node> vertexCover;
     vector<Edge> edges;
     // populate edges
     for(int i = 0; i < NODES; i++){
         for(int j = 0; j < i; j++){
-            if(graph[i][j] == '0'){
-                Edge e(i, j);
+            if(graph[i][j] == '0'){ // INVERSE
+                Edge e(nodeList[i], nodeList[j]);
                 edges.push_back(e);
             }
         }
     }
+    // sort edges with largest first
+    sort(edges.begin(), edges.end());
+
     // if debug print edges
     if(DEBUG){
         cout << "Edges: " << edges.size() << endl;
         for(int i = 0; i < (int)edges.size(); i++){
-            cout << edges[i].uName() << "-" << edges[i].vName() << " ";
+            cout << edges[i].uName() << "-" << edges[i].vName() << " " << edges[i].degree() << endl;
         }
         cout << endl;
     }
-    while (!edges.empty()){
-        Edge e = edges.back();
-        edges.pop_back();
-        vertexCover.push_back(Node(e.uName()));
-        vertexCover.push_back(Node(e.vName()));
+    while(!edges.empty()){
+        // Edge e = edges[0];
+        Edge e = edges[edges.size() - 1];
+        cout << "Adding: " << e << " " << e.degree() << endl;
+        vertexCover.push_back(e.getU());
+        if(edges.size() > 1) vertexCover.push_back(e.getV());
+        // edges.erase(edges.begin());
+        cout << "Removing: " << e << endl;
+        edges.erase(edges.end() - 1);
+        // Remove all edges that contain the nodes
         for(int i = 0; i < (int)edges.size(); i++){
-            if(edges[i].uName() == e.uName() || edges[i].vName() == e.uName() || edges[i].uName() == e.vName() || edges[i].vName() == e.vName()){
+            if(edges[i].getU() == e.getU() || edges[i].getU() == e.getV() || edges[i].getV() == e.getU() || edges[i].getV() == e.getV()){
                 edges.erase(edges.begin() + i);
                 i--;
             }
@@ -228,10 +256,11 @@ int main(int argc, char** argv){
     }
     // 
     if(DEBUG){
-        cout << "Independent Set: ";
+        cout << "Max Clique: ";
         for(int i = 0; i < (int)independentSet.size(); i++){
             cout << independentSet[i] << " ";
         }
+        cout << "Is clique "  << VerifyClique(graph, independentSet);
         cout << endl;
     }
     ////////////////////////////////////////////////////////////////////
