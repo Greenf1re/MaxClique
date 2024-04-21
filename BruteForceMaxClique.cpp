@@ -4,24 +4,82 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#define DEBUG false
+#define DEBUG true
 using namespace std;
 int NODES = 0;
-
-void ReadGraph(string filename, int **graph, vector<int>& nodeList){
+class Node{
+    public:
+        int id;
+        int degree;
+        Node(int id, int degree){
+            this->id = id;
+            this->degree = degree;
+        }
+        Node(){
+            id = 0;
+            degree = 0;
+        }
+        Node(int u){
+            id = u;
+            degree = 0;
+        }
+        bool operator<(const Node& n) const{
+            return degree > n.degree;
+        }
+        // overload << operator
+        friend ostream& operator<<(ostream& os, const Node& n){
+            os << n.id;
+            return os;
+        }
+        // overload [] operator
+        int operator[](int index){
+            if(index == 0) return id;
+            else return degree;
+        }
+        // Overload >> operator
+        friend istream& operator>>(istream& is, Node& n){
+            is >> n.id;
+            return is;
+        }
+        int name(){
+            return id;
+        }
+};
+void ReadGraph(string filename, int **graph, vector<Node>& nodeList){
     ifstream file;
     file.open(filename);
     if(file.is_open()){
         for(int i = 0; i < NODES; i++){
             file >> nodeList[i];
-            for(int j = 0; j < i; j++){
-                file >> graph[i][j];
-                graph[j][i] = graph[i][j];
+            for(int j = 0; j <= i; j++){
+                if (i == j) graph[i][j] = 1;
+                else{
+                    file >> graph[i][j];
+                    graph[j][i] = graph[i][j];
+                }
             }
         }
     }
 }
-void PrintGraph(int **graph, vector<int>& nodeList){
+void CountEdges(int** Graph, vector<Node>& clique){
+    // Count the number of edges in the graph and store in return vector
+    for(int i = 0; i < (int)clique.size(); i++){
+        for(int j = 0; j < (int)clique.size(); j++){
+            if(Graph[clique[i].name()][clique[j].name()] == 1){ 
+                // count++;
+                clique[i].degree++;
+            }
+        }
+    }
+}
+int AverageDegree(vector<Node>& nodeList){
+    int sum = 0;
+    for(int i = 0; i < NODES; i++){
+        sum += nodeList[i].degree;
+    }
+    return sum/NODES;
+}
+void PrintGraph(int **graph, vector<Node>& nodeList){
     for(int i = 0; i < NODES; i++){
         cout << nodeList[i] << " ";
         for(int j = 0; j < NODES; j++){
@@ -30,10 +88,10 @@ void PrintGraph(int **graph, vector<int>& nodeList){
         cout << endl;
     }
 }
-bool VerifyClique(int **graph, vector<int>& clique){
+bool VerifyClique(int **graph, vector<Node>& clique){
     for(int i = 0; i < (int)clique.size(); i++){
         for(int j = i+1; j < (int)clique.size(); j++){
-            if(graph[clique[i]][clique[j]] == 0){
+            if(graph[clique[i].name()][clique[j].name()] == 0){
                 return false;
             }
         }
@@ -42,7 +100,7 @@ bool VerifyClique(int **graph, vector<int>& clique){
 }
 int main(int argc, char** argv){
     int **graph = NULL;
-    vector<int> nodeList;
+    vector<Node> nodeList;
     string filename;
 
     if(argc < 3){
@@ -68,15 +126,24 @@ int main(int argc, char** argv){
     if(DEBUG){
         PrintGraph(graph, nodeList);
     }
-    vector<int> maxClique;
+    ////////////////////////////////////////////////////////////////////
+    vector<Node> maxClique;
+    if(DEBUG){
+        CountEdges(graph, nodeList);
+        for (int i = 0; i < NODES; i++){
+            cout << nodeList[i] << " " << nodeList[i].degree << endl;
+        }
+        // sort(nodeList.begin(), nodeList.end());
+        int avgDegree = AverageDegree(nodeList);
+        cout << "Average Degree: " << avgDegree << endl;
+    }
     // Bruteforce using combinations of nodes
-    // CODE_HERE
     int maxSize = 0;
     for (int size = 1; size <= NODES; size++) {
         vector<bool> v(NODES);
         fill(v.end() - size, v.end(), true);  // Initialize the combination vector
         do {
-            vector<int> currentClique;
+            vector<Node> currentClique;
             for (int i = 0; i < NODES; i++) {
                 if (v[i]) {
                     currentClique.push_back(i);
@@ -91,10 +158,15 @@ int main(int argc, char** argv){
             }
         } while (next_permutation(v.begin(), v.end()));
     }
+    
     ////////////////////////////////////////////////////////////////////
     cout << "Max Clique: ";
     for(int i = 0; i < (int)maxClique.size(); i++){
-        cout << nodeList[maxClique[i]] << " ";
+        cout << nodeList[maxClique[i].name()] << " ";
+    }
+    cout << endl << "Node degrees: ";
+    for(int i = 0; i < (int)maxClique.size(); i++){
+        cout << nodeList[maxClique[i].name()].degree << " ";
     }
     cout << endl;
     cout << "Size: " << maxClique.size() << endl;

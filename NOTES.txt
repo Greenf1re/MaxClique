@@ -1,0 +1,17 @@
+D11G25
+Avg: 4
+Max Clique: 15 21 24 
+EdgeCounts: 8  4   6
+Size: 3
+
+D14G25
+Avg: 5
+Max Clique: 15 21 24 
+EdgeCounts: 8  4   6
+Size: 3
+
+D14G26
+Avg: 5
+Max Clique: 15 21 24 
+Node degrees: 8 4 6
+Size: 3
