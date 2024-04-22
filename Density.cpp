@@ -160,16 +160,16 @@ int main(int argc, char** argv){
         cin >> filename;
     }
     else{
-        NODES = atoi(argv[2]);
+        NODES = atoi(argv[2]);  // Number of nodes
         filename = argv[1];
     }
     graph = new uint8_t*[NODES];
     for(int i = 0; i < NODES; i++){
-        graph[i] = new uint8_t[NODES];
+        graph[i] = new uint8_t[NODES];  // Allocate memory for the graph
     }
     nodeList.resize(NODES);
 
-    ReadGraph(filename, graph, nodeList);
+    ReadGraph(filename, graph, nodeList);   // Read the graph
     // print the graph
     if(DEBUG){
         PrintGraph(graph, nodeList);
@@ -179,33 +179,33 @@ int main(int argc, char** argv){
     int density = 0;
     for(int i = 0; i < NODES; i++){
         for(int j = 0; j < NODES; j++){
-            if(graph[i][j] == '1'){
+            if(graph[i][j] == '1'){ // If there is an edge
                 density++;
             }
         }
     }
-    density = round((double)density/(double)(NODES*NODES)*100);
+    density = round((double)density/(double)(NODES*NODES)*100); // Density is the number of edges divided by the number of possible edges
     cout << "Density: " << density << "%" << endl;
-    CountEdges(graph, nodeList);
+    CountEdges(graph, nodeList);    // Count the number of edges for each node
     ////////////////////////////////////////////////////////////////////
     // Find the average degree of the graph
-    int avgDegree = AverageDegree(nodeList);
+    int avgDegree = AverageDegree(nodeList);    // Average degree of the graph
     cout << "Average Degree: " << avgDegree << endl;
     ////////////////////////////////////////////////////////////////////
     // Estimate largest clique size
     int maxCliqueSize = 0;
     for(int i = 0; i < NODES; i++){
         int count = 0;
-        for(int j = 0; j < NODES; j++){
-            if(graph[i][j] == '1'){
-                count++;
+        for(int j = 0; j < NODES; j++){ // Count the number of 1s in the row
+            if(graph[i][j] == '1'){ // If there is an edge
+                count++;    
             }
         }
-        if(count > maxCliqueSize){
-            maxCliqueSize = count;
+        if(count > maxCliqueSize){  // If the count is greater than the max clique size
+            maxCliqueSize = count;  // Set the max clique size to the count
         }
     }
-    cout << "Estimated Max Clique Size: " << (((double)density/100.0) * NODES) << endl;
+    cout << "Estimated Max Clique Size: " << (((double)density/100.0) * NODES) << endl; // Estimated max clique size
     int maxDegree = 0;
     for(int i = 0; i < NODES; i++){
         if(nodeList[i].degree > maxDegree){

@@ -37,7 +37,8 @@ The basic steps in the final algorithm:
 7. Until we run out of nodes.
 
 # Notes
-I used O3 to run compiler optimizations which greatly improved my running times. Some of these statistics are found in NOTES.txt
+- I used O3 to run compiler optimizations which greatly improved my running times. Some of these statistics are found in NOTES.txt
+- A more exhaustive search (longer runtime) can be toggled by replacing "FindPosSimilarity" with "FindAbsSimilarity" in lines 221 and 271 
 # Files in the project:
 - 6 cpp files for each program
 - Makefile

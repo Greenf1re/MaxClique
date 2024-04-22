@@ -73,8 +73,8 @@ void CountEdges(uint8_t** Graph, vector<Node>& clique){
     // Count the number of edges in the graph and store in return vector
     for(int i = 0; i < (int)clique.size(); i++){
         for(int j = 0; j < (int)clique.size(); j++){
-            if((uint8_t)Graph[clique[i].name()][clique[j].name()] != '0'){ 
-                clique[i].degree++;
+            if((uint8_t)Graph[clique[i].name()][clique[j].name()] != '0'){  // If there is an edge
+                clique[i].degree++; // Increment the degree of the node
             }
         }
     }
@@ -82,20 +82,20 @@ void CountEdges(uint8_t** Graph, vector<Node>& clique){
 int AverageDegree(vector<Node>& nodeList){
     double sum = 0;
     for(int i = 0; i < NODES; i++){
-        sum += nodeList[i].degree;
+        sum += nodeList[i].degree;  // Sum the degrees of all nodes
     }
     return round(sum/(double)NODES);
 }
 void PrintGraph(uint8_t **graph, vector<Node>& nodeList){
     for(int i = 0; i < NODES; i++){
         cout << nodeList[i] << " ";
-        for(int j = 0; j < NODES; j++){
+        for(int j = 0; j < NODES; j++){ // Print the graph
             cout << graph[i][j] << " ";
         }
         cout << endl;
     }
 }
-int FindAbsSimilarity(uint8_t **graph, uint8_t *row, int compareRow){
+int FindAbsSimilarity(uint8_t **graph, uint8_t *row, int compareRow){ // Find the similarity between a row and the graph using index
     int count = 0;
     for(int i = 0; i < NODES; i++){
         if(graph[compareRow][i] == row[i]){ //Absolute similarity instead of just 1s
@@ -104,7 +104,7 @@ int FindAbsSimilarity(uint8_t **graph, uint8_t *row, int compareRow){
     }
     return count;
 }
-int FindPosSimilarity(uint8_t **graph, uint8_t *row, int compareRow){
+int FindPosSimilarity(uint8_t **graph, uint8_t *row, int compareRow){   // Find the similarity between a row and the graph using index
     int count = 0;
     for(int i = 0; i < NODES; i++){
         if(graph[compareRow][i] == row[i] && row[i] != '0'){ //Absolute similarity instead of just 1s
@@ -113,10 +113,10 @@ int FindPosSimilarity(uint8_t **graph, uint8_t *row, int compareRow){
     }
     return count;
 }
-int CompareAbsSimilarity(uint8_t *row1, uint8_t* row2){
+int CompareAbsSimilarity(uint8_t *row1, uint8_t* row2){ // Compare two rows for absolute similarity
     int count = 0;
     for(int i = 0; i < NODES; i++){
-        if(row1[i] == row2[i]){
+        if(row1[i] == row2[i]){ //Absolute similarity instead of just 1s
             count++;
         }
     }
@@ -125,7 +125,7 @@ int CompareAbsSimilarity(uint8_t *row1, uint8_t* row2){
 bool VerifyClique(uint8_t **graph, vector<Node>& clique){
     for(int i = 0; i < (int)clique.size(); i++){
         for(int j = i+1; j < (int)clique.size(); j++){
-            if(graph[clique[i].name()][clique[j].name()] == '0'){
+            if(graph[clique[i].name()][clique[j].name()] == '0'){   // If there is no edge between the nodes
                 return false;
             }
         }
@@ -166,13 +166,13 @@ int main(int argc, char** argv){
         filename = argv[1];
         solutionFilename = argv[2];
     }
-    graph = new uint8_t*[NODES];
+    graph = new uint8_t*[NODES];    // Allocate memory for the graph
     for(int i = 0; i < NODES; i++){
         graph[i] = new uint8_t[NODES];
     }
     nodeList.resize(NODES);
 
-    ReadGraph(filename, graph, nodeList);
+    ReadGraph(filename, graph, nodeList);   // Read the graph
     // print the graph
     if(DEBUG){
         PrintGraph(graph, nodeList);
@@ -180,19 +180,19 @@ int main(int argc, char** argv){
     // Read the solution file
     ifstream file;
     file.open(solutionFilename);
-    vector<Node> clique;
+    vector<Node> clique;    // Store the clique
     if(file.is_open()){
         int node;
         while(file >> node){
-            clique.push_back(Node(node));
+            clique.push_back(Node(node));   // Add the node to the clique
         }
     }
     else{
-        cout << "Error opening file: " << solutionFilename << endl;
+        cout << "Error opening file: " << solutionFilename << endl; 
         return 1;
     }
     // Verify the clique
-    if(VerifyClique(graph, clique)){
+    if(VerifyClique(graph, clique)){    // If the clique is valid
         cout << "Clique is valid" << endl;
     }
     else{

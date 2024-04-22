@@ -9,6 +9,7 @@
 #define DEBUG false
 using namespace std;
 int NODES = 0;
+// A node contains the id (name of the node) and its degree (number of edges connected to it)
 class Node{
     public:
         int id;
@@ -26,7 +27,7 @@ class Node{
             degree = 0;
         }
         bool operator<(const Node& n) const{
-            return degree > n.degree;
+            return degree > n.degree; // Is actually greater than, but I didn't want to mess with the sort function
         }
         // ==
         bool operator==(const Node& n) const{
@@ -51,6 +52,7 @@ class Node{
             return id;
         }
 };
+// An edge contains two nodes, u and v. Methods include getting the nodes, getting the name of the nodes, and comparing edges
 class Edge{
     Node u;
     Node v;
@@ -81,7 +83,7 @@ class Edge{
             // int max2 = max(e.uName(), e.vName());
             int max1 = u.degree + v.degree;
             int max2 = e.u.degree + e.v.degree;
-            return max1 < max2;
+            return max1 < max2; // Compares the sum of the degrees of the nodes
         }
         int degree(){
             // return max(u.degree, v.degree);
@@ -92,7 +94,7 @@ class Edge{
             return os;
         }
 };
-void CountInvEdges(uint8_t** Graph, vector<Node>& clique){
+void CountInvEdges(uint8_t** Graph, vector<Node>& clique){ // Inverse of CountEdges. Counts non-connections
     // Count the number of edges in the graph and store in return vector
     for(int i = 0; i < (int)clique.size(); i++){
         for(int j = 0; j < i; j++){
@@ -105,7 +107,7 @@ void CountInvEdges(uint8_t** Graph, vector<Node>& clique){
         }
     }
 }
-void CountEdges(uint8_t** Graph, vector<Node>& clique){
+void CountEdges(uint8_t** Graph, vector<Node>& clique){ //Counts connections in the graph
     // Count the number of edges in the graph and store in return vector
     for(int i = 0; i < (int)clique.size(); i++){
         for(int j = 0; j < (int)clique.size(); j++){
@@ -116,7 +118,7 @@ void CountEdges(uint8_t** Graph, vector<Node>& clique){
         }
     }
 }
-void ReadGraph(string filename, uint8_t **graph, vector<Node>& nodeList){
+void ReadGraph(string filename, uint8_t **graph, vector<Node>& nodeList){   // Read the graph from a file
     ifstream file;
     file.open(filename);
     if(file.is_open()){
@@ -148,7 +150,7 @@ void PrintGraph(uint8_t **graph, vector<Node>& nodeList){
 bool VerifyClique(uint8_t **graph, vector<Node>& clique){
     for(int i = 0; i < (int)clique.size(); i++){
         for(int j = i+1; j < (int)clique.size(); j++){
-            if(graph[clique[i].name()][clique[j].name()] == '0'){
+            if(graph[clique[i].name()][clique[j].name()] == '0'){   // If there is no connection between the nodes we return false
                 return false;
             }
         }
@@ -186,7 +188,7 @@ int main(int argc, char** argv){
         NODES = atoi(argv[2]);
         filename = argv[1];
     }
-    graph = new uint8_t*[NODES];
+    graph = new uint8_t*[NODES]; // Allocate memory for the graph
     for(int i = 0; i < NODES; i++){
         graph[i] = new uint8_t[NODES];
     }
@@ -195,8 +197,7 @@ int main(int argc, char** argv){
     ReadGraph(filename, graph, nodeList);
     // find degree
     vector<Node> test = nodeList;
-    // CountEdges(graph, test);
-    // cout << "TEST: " << endl;
+
     // Timer
     auto start = chrono::high_resolution_clock::now();
     CountInvEdges(graph, nodeList);
@@ -204,12 +205,13 @@ int main(int argc, char** argv){
     auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
     cout << "Time: " << duration.count() << " microseconds" << endl;
 ////////////////////////////////////////////////////////////////
+    // Find the largest vertex cover
     vector<Node> vertexCover;
     vector<Edge> edges;
-    // populate edges
+    // populate edges with inverse graph
     for(int i = 0; i < NODES; i++){
         for(int j = 0; j < i; j++){
-            if(graph[i][j] == '0'){ // INVERSE
+            if(graph[i][j] == '0'){ // 1 for regular, 0 for INVERSE
                 Edge e(nodeList[i], nodeList[j]);
                 edges.push_back(e);
             }
@@ -226,15 +228,16 @@ int main(int argc, char** argv){
         }
         cout << endl;
     }
+    // Find the vertex cover
     while(!edges.empty()){
         // Edge e = edges[0];
         Edge e = edges[edges.size() - 1];
         cout << "Adding: " << e << " " << e.degree() << endl;
-        vertexCover.push_back(e.getU());
-        if(edges.size() > 1) vertexCover.push_back(e.getV());
+        vertexCover.push_back(e.getU()); // Add the node to the vertex cover
+        if(edges.size() > 1) vertexCover.push_back(e.getV()); // If there is more than one edge left, add the other node to the vertex cover
         // edges.erase(edges.begin());
         cout << "Removing: " << e << endl;
-        edges.erase(edges.end() - 1);
+        edges.erase(edges.end() - 1);   // Remove the edge from the list
         // Remove all edges that contain the nodes
         for(int i = 0; i < (int)edges.size(); i++){
             if(edges[i].getU() == e.getU() || edges[i].getU() == e.getV() || edges[i].getV() == e.getU() || edges[i].getV() == e.getV()){
@@ -253,7 +256,9 @@ int main(int argc, char** argv){
         }
         cout << endl;
     }
-    vector<Node> independentSet;
+    vector<Node> independentSet; // Independent Set(G') = Graph - Vertex Cover(G')
+                                 // Independent Set (G') = Max Clique(G)
+                                 // Max Clique(G) = Graph - Vertex Cover(G')
     // Independent Set = Graph - Vertex Cover
     for(int i = 0; i < NODES; i++){
         if(find(vertexCover.begin(), vertexCover.end(), nodeList[i]) == vertexCover.end()){

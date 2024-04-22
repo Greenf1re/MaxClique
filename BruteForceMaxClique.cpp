@@ -7,6 +7,7 @@
 #define DEBUG true
 using namespace std;
 int NODES = 0;
+// A node contains the id (name of the node) and its degree (number of edges connected to it)
 class Node{
     public:
         int id;
@@ -45,7 +46,7 @@ class Node{
             return id;
         }
 };
-void ReadGraph(string filename, int **graph, vector<Node>& nodeList){
+void ReadGraph(string filename, int **graph, vector<Node>& nodeList){   // Read the graph from the file
     ifstream file;
     file.open(filename);
     if(file.is_open()){
@@ -61,7 +62,7 @@ void ReadGraph(string filename, int **graph, vector<Node>& nodeList){
         }
     }
 }
-void CountEdges(int** Graph, vector<Node>& clique){
+void CountEdges(int** Graph, vector<Node>& clique){ // Count the number of edges in the graph and store in return vector
     // Count the number of edges in the graph and store in return vector
     for(int i = 0; i < (int)clique.size(); i++){
         for(int j = 0; j < (int)clique.size(); j++){
@@ -72,14 +73,14 @@ void CountEdges(int** Graph, vector<Node>& clique){
         }
     }
 }
-int AverageDegree(vector<Node>& nodeList){
+int AverageDegree(vector<Node>& nodeList){  // Calculate the average degree of the nodes in the graph
     int sum = 0;
     for(int i = 0; i < NODES; i++){
         sum += nodeList[i].degree;
     }
     return sum/NODES;
 }
-void PrintGraph(int **graph, vector<Node>& nodeList){
+void PrintGraph(int **graph, vector<Node>& nodeList){   // Print the graph
     for(int i = 0; i < NODES; i++){
         cout << nodeList[i] << " ";
         for(int j = 0; j < NODES; j++){
@@ -88,7 +89,7 @@ void PrintGraph(int **graph, vector<Node>& nodeList){
         cout << endl;
     }
 }
-bool VerifyClique(int **graph, vector<Node>& clique){
+bool VerifyClique(int **graph, vector<Node>& clique){   // Verify if the nodes in the clique are connected
     for(int i = 0; i < (int)clique.size(); i++){
         for(int j = i+1; j < (int)clique.size(); j++){
             if(graph[clique[i].name()][clique[j].name()] == 0){
@@ -115,13 +116,13 @@ int main(int argc, char** argv){
         NODES = atoi(argv[2]);
         filename = argv[1];
     }
-    graph = new int*[NODES];
+    graph = new int*[NODES];    // Allocate memory for the graph
     for(int i = 0; i < NODES; i++){
         graph[i] = new int[NODES];
     }
     nodeList.resize(NODES);
 
-    ReadGraph(filename, graph, nodeList);
+    ReadGraph(filename, graph, nodeList);   // Read the graph from the file
     // print the graph
     if(DEBUG){
         PrintGraph(graph, nodeList);
@@ -137,16 +138,17 @@ int main(int argc, char** argv){
         int avgDegree = AverageDegree(nodeList);
         cout << "Average Degree: " << avgDegree << endl;
     }
+
     // Bruteforce using combinations of nodes
     int maxSize = 0;
-    for (int size = 1; size <= NODES; size++) {
-        vector<bool> v(NODES);
+    for (int size = 1; size <= NODES; size++) { // Iterate over all possible sizes of the clique
+        vector<bool> v(NODES);                  // Create a vector of booleans of size NODES to represent the combination
         fill(v.end() - size, v.end(), true);  // Initialize the combination vector
         do {
-            vector<Node> currentClique;
+            vector<Node> currentClique; 
             for (int i = 0; i < NODES; i++) {
-                if (v[i]) {
-                    currentClique.push_back(i);
+                if (v[i]) {                      // If the node is in the combination
+                    currentClique.push_back(i); // Add the node to the current clique
                 }
             }
             if (VerifyClique(graph, currentClique)) {
@@ -156,7 +158,7 @@ int main(int argc, char** argv){
                     cout << "New Size: " << maxSize << endl;
                 }
             }
-        } while (next_permutation(v.begin(), v.end()));
+        } while (next_permutation(v.begin(), v.end())); // Generate the next combination
     }
     
     ////////////////////////////////////////////////////////////////////
