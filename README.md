@@ -7,7 +7,7 @@
  
 
 # Getting Started
-To compile each program: type "make" + "program name" in the command line. The main program of interest is Original.exe, compiled with make original
+To compile each program: type "make" + "program name" in the command line. The main program of interest is Original.exe, compiled with ```make original```. The relevant source code is *OriginalMaxClique.cpp*
 ## Programs
 - Original: my original approach to solving Max Clique. use ```make``` to compile with optimizations, or ```make original``` for regular compilation
 - ```./Original.exe <graph file> <node count>```
