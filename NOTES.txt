@@ -16,7 +16,29 @@ Max Clique: 15 21 24
 Node degrees: 8 4 6
 Size: 3
 
+Q60V1000
+16 in 12m
+O3: 47 in 2.5m
+Read in 3046ms
+O3: 53ms
+
+Q45V700
+45 in > 15min
+O3: 40s
+Read in 1238ms
+Read in 24ms
+
 Q30V400
 Density: 35%
 Average Degree: 142
 Max Degree: 246
+30 in 1m48
+O3: 3.726s
+Read in 200ms
+O3: 3ms
+
+Q15V100
+15 in 0.643s
+O3: 0.195
+Read in 3ms
+O3: 0ms

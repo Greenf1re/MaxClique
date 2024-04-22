@@ -206,7 +206,7 @@ int main(int argc, char** argv){
         similarity[i] = new int[NODES];
     }
     int maxSimilarity = 0;
-    int row1, row2;
+    int row1 = -1, row2 = -1;
     if (!THREADED){
         for(int i = 0; i < NODES; i++){
             similarity[i][i] = 0;
@@ -262,7 +262,7 @@ int main(int argc, char** argv){
         for(int i = 0; i < NODES; i++){
             // Check if the row is already in the clique
             if(find(clique.begin(), clique.end(), nodeList[i]) != clique.end()) continue;
-            if(find(triedCliques.begin(), triedCliques.end(), nodeList[i]) != triedCliques.end()) continue;
+            // if(find(triedCliques.begin(), triedCliques.end(), nodeList[i]) != triedCliques.end()) continue;
             int sim = FindPosSimilarity(graph, newRow, i);
             if(sim > maxSim){
                 maxSim = sim;
